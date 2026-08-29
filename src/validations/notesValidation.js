@@ -1,0 +1,41 @@
+import { Joi, Segments } from 'celebrate';
+import { tags } from '../constants/tags.js';
+import { isValidObjectId } from 'mongoose';
+
+export const getAllNotesSchema = {
+  [Segments.QUERY]: Joi.object({
+    search: Joi.string().allow(''),
+    tag: Joi.string().valid(...tags),
+    page: Joi.number().integer().min(1).default(1),
+    perPage: Joi.number().integer().min(5).max(20).default(10),
+  }),
+};
+
+const idValidation = (value, helpers) => {
+  return isValidObjectId(value) ? value : helpers.message('Invalid id format');
+};
+
+export const noteIdSchema = {
+  [Segments.PARAMS]: Joi.object({
+    noteId: Joi.string().custom(idValidation).required(),
+  }),
+};
+
+export const createNoteSchema = {
+  [Segments.BODY]: Joi.object({
+    title: Joi.string().min(1).required(),
+    content: Joi.string().allow(''),
+    tag: Joi.string().valid(...tags),
+  }),
+};
+
+export const updateNoteSchema = {
+  [Segments.PARAMS]: Joi.object({
+    noteId: Joi.string().custom(idValidation).required(),
+  }),
+  [Segments.BODY]: Joi.object({
+    title: Joi.string().min(1),
+    content: Joi.string().allow(''),
+    tag: Joi.string().valid(...tags),
+  }).min(1),
+};
