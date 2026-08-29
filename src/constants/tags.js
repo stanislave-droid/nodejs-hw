@@ -1,4 +1,4 @@
-export const tags = [
+export const TAGS = [
   'Todo',
   'Work',
   'Personal',
