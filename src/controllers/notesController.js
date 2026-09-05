@@ -53,7 +53,7 @@ export const getNoteById = async (req, res) => {
   const userId = req.user._id;
   const note = await Note.findOne({ _id: noteId, userId });
   if (!note) {
-    throw createHttpError({ status: 404, message: 'Note not found' });
+    throw createHttpError('404', 'Note not found');
   }
   res.status(200).json(note);
 };
@@ -70,7 +70,7 @@ export const deleteNote = async (req, res) => {
   const userId = req.user._id;
   const deletedNote = await Note.findOneAndDelete({ _id: noteId, userId });
   if (!deletedNote) {
-    throw createHttpError({ status: 404, message: 'Note not found' });
+    throw createHttpError('404', 'Note not found');
   }
   res.status(200).json(deletedNote);
 };
@@ -86,7 +86,7 @@ export const updateNote = async (req, res) => {
     },
   );
   if (!updatedNote) {
-    throw createHttpError({ status: 404, message: 'Note not found' });
+    throw createHttpError('404', 'Note not found');
   }
 
   res.status(200).json(updatedNote);
