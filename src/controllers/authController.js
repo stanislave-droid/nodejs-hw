@@ -9,7 +9,7 @@ export const registerUser = async (req, res) => {
   const isUser = await User.findOne({ email });
 
   if (isUser) {
-    throw createHttpError('400', 'Email in use');
+    throw createHttpError(400, 'Email in use');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -27,13 +27,13 @@ export const loginUser = async (req, res) => {
   const isUser = await User.findOne({ email });
 
   if (!isUser) {
-    throw createHttpError('401', 'Invalid credentials');
+    throw createHttpError(401, 'Invalid credentials');
   }
 
   const isPasswordValid = await bcrypt.compare(password, isUser.password);
 
   if (!isPasswordValid) {
-    throw createHttpError('401', 'Invalid credentials');
+    throw createHttpError(401, 'Invalid credentials');
   }
 
   await Session.deleteOne({ userId: isUser._id });
@@ -49,13 +49,13 @@ export const refreshUserSession = async (req, res) => {
   const session = await Session.findById(sessionId);
 
   if (!session) {
-    throw createHttpError('401', 'Session not found');
+    throw createHttpError(401, 'Session not found');
   }
 
   const expireRefreshToken = session.refreshTokenValidUntil < new Date();
 
   if (expireRefreshToken) {
-    throw createHttpError('401', 'Session token expired');
+    throw createHttpError(401, 'Session token expired');
   }
 
   await Session.deleteOne({ _id: sessionId });
