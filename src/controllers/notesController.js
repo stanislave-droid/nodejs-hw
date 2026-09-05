@@ -3,8 +3,9 @@ import { Note } from '../models/note.js';
 
 export const getAllNotes = async (req, res) => {
   const { search, tag, page = 1, perPage = 10 } = req.query;
+  const userId = req.user._id;
 
-  const customQuery = Note.find();
+  const customQuery = Note.find({ userId });
 
   if (search) {
     customQuery.where({
@@ -38,6 +39,10 @@ export const getAllNotes = async (req, res) => {
     customQuery.countDocuments(),
   ]);
 
+  if (!notes) {
+    throw createHttpError('404', 'Note not found');
+  }
+
   const totalPages = Math.ceil(totalNotes / perPage);
 
   res.status(200).json({ page, perPage, totalNotes, totalPages, notes });
@@ -45,7 +50,8 @@ export const getAllNotes = async (req, res) => {
 
 export const getNoteById = async (req, res) => {
   const { noteId } = req.params;
-  const note = await Note.findById(noteId);
+  const userId = req.user._id;
+  const note = await Note.findOne({ _id: noteId, userId });
   if (!note) {
     throw createHttpError({ status: 404, message: 'Note not found' });
   }
@@ -54,13 +60,15 @@ export const getNoteById = async (req, res) => {
 
 export const createNote = async (req, res) => {
   const note = req.body;
-  const newNote = await Note.create(note);
+  const userId = req.user._id;
+  const newNote = await Note.create({ ...note, userId });
   res.status(201).json(newNote);
 };
 
 export const deleteNote = async (req, res) => {
   const { noteId } = req.params;
-  const deletedNote = await Note.findOneAndDelete({ _id: noteId });
+  const userId = req.user._id;
+  const deletedNote = await Note.findOneAndDelete({ _id: noteId, userId });
   if (!deletedNote) {
     throw createHttpError({ status: 404, message: 'Note not found' });
   }
@@ -69,9 +77,14 @@ export const deleteNote = async (req, res) => {
 
 export const updateNote = async (req, res) => {
   const { noteId } = req.params;
-  const updatedNote = await Note.findOneAndUpdate({ _id: noteId }, req.body, {
-    returnDocument: 'after',
-  });
+  const userId = req.user._id;
+  const updatedNote = await Note.findOneAndUpdate(
+    { _id: noteId, userId },
+    req.body,
+    {
+      returnDocument: 'after',
+    },
+  );
   if (!updatedNote) {
     throw createHttpError({ status: 404, message: 'Note not found' });
   }
