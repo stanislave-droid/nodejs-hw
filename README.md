@@ -1,1 +1,1 @@
-## Node server + MongoDB + Validation + Filters
+## Node server + MongoDB + Email + Image
