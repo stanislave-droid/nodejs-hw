@@ -12,6 +12,10 @@ const userSchema = new Schema(
       match: emailRegex,
     },
     password: { type: String, required: true },
+    avatar: {
+      type: String,
+      default: 'https://ac.goit.global/fullstack/react/default-avatar.jpg',
+    },
   },
   { timestamps: true, versionKey: false },
 );
